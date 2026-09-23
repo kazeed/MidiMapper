@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="MidiMapper/MidiMapper.csproj" />
+  <Project Path="MidiMapper.Tests/MidiMapper.Tests.csproj" />
+</Solution>

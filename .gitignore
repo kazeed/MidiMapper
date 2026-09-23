@@ -8,6 +8,11 @@
 ## Get latest from https://github.com/github/gitignore/blob/main/Dotnet.gitignore
 
 # Build results
+.vs/
+.vscode/
+.idea/
+.fleet/
+[Bb]uild/
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
@@ -42,6 +47,28 @@ ScaffoldingReadMe.txt
 # Others
 ~$*
 *~
+.atom/
+.apm/
+.project
+.settings/
+.metadata/
+.classpath
+.factorypath
+.sublime-workspace
+.sublime-project
+.kateproject
+.kateproject.d/
+.directory
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.code-workspace
+.#*
+*.swp
+*.swo
+*.swn
+Session.vim
 CodeCoverage/
 
 # MSBuild Binary and Structured Log

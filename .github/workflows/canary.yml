@@ -1,0 +1,87 @@
+name: Canary build
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.x
+
+      - name: Test
+        run: dotnet test MidiMapper/MidiMapper.slnx --configuration Release --nologo
+
+  publish-windows:
+    name: Publish Windows canary
+    runs-on: windows-latest
+    needs: test
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.x
+
+      - name: Publish single-file executable
+        run: dotnet publish MidiMapper/MidiMapper/MidiMapper.csproj --configuration Release --runtime win-x64 --nologo
+
+      - name: Create zip archive
+        shell: pwsh
+        run: Compress-Archive -Path MidiMapper/MidiMapper/bin/Release/net10.0/win-x64/publish/MidiMapper.exe -DestinationPath MidiMapper-win-x64-canary.zip
+
+      - name: Upload canary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MidiMapper-win-x64-canary-${{ github.sha }}
+          path: MidiMapper-win-x64-canary.zip
+          if-no-files-found: error
+
+  publish-unix:
+    name: Publish Linux canary
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.x
+
+      - name: Publish single-file executable
+        run: dotnet publish MidiMapper/MidiMapper/MidiMapper.csproj --configuration Release --runtime linux-x64 --nologo
+
+      - name: Make executable runnable
+        run: chmod +x MidiMapper/MidiMapper/bin/Release/net10.0/linux-x64/publish/MidiMapper
+
+      - name: Create zip archive
+        run: zip MidiMapper-linux-x64-canary.zip MidiMapper/MidiMapper/bin/Release/net10.0/linux-x64/publish/MidiMapper
+
+      - name: Upload canary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MidiMapper-linux-x64-canary-${{ github.sha }}
+          path: MidiMapper-linux-x64-canary.zip
+          if-no-files-found: error
