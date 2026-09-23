@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up .NET 10
         uses: actions/setup-dotnet@v4
@@ -44,7 +44,7 @@ jobs:
 
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up .NET 10
         uses: actions/setup-dotnet@v4
@@ -55,7 +55,7 @@ jobs:
         run: dotnet test src/MidiMapper.slnx --configuration Release --collect:"XPlat Code Coverage" --results-directory coverage --nologo
 
       - name: Store coverage report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-report
           path: coverage/**/coverage.cobertura.xml
@@ -73,13 +73,13 @@ jobs:
 
     steps:
       - name: Download coverage report
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: coverage-report
           path: coverage
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           files: coverage/**/coverage.cobertura.xml
           fail_ci_if_error: true
@@ -93,7 +93,7 @@ jobs:
 
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up .NET 10
         uses: actions/setup-dotnet@v4
@@ -108,7 +108,7 @@ jobs:
         run: Compress-Archive -Path src/MidiMapper/bin/Release/net10.0/win-x64/publish/MidiMapper.exe -DestinationPath MidiMapper-win-x64-canary.zip
 
       - name: Upload canary artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: MidiMapper-win-x64-canary-${{ github.sha }}
           path: MidiMapper-win-x64-canary.zip
@@ -122,7 +122,7 @@ jobs:
 
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up .NET 10
         uses: actions/setup-dotnet@v4
@@ -139,7 +139,7 @@ jobs:
         run: zip -j MidiMapper-linux-x64-canary.zip src/MidiMapper/bin/Release/net10.0/linux-x64/publish/MidiMapper
 
       - name: Upload canary artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: MidiMapper-linux-x64-canary-${{ github.sha }}
           path: MidiMapper-linux-x64-canary.zip
