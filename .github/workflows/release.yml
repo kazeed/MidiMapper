@@ -1,21 +1,64 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Semantic version to release, without the leading v
+        required: true
+        type: string
+        default: 1.0.0
 
 permissions:
   contents: write
 
 jobs:
+  prepare:
+    name: Create release tag
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.release.outputs.tag }}
+
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Create tag
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [ "$GITHUB_REF_NAME" != "main" ]; then
+            echo "Run this workflow from the main branch." >&2
+            exit 1
+          fi
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version must have the form MAJOR.MINOR.PATCH." >&2
+            exit 1
+          fi
+          tag="v$VERSION"
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" >/dev/null 2>&1; then
+            echo "Tag $tag already exists." >&2
+            exit 1
+          fi
+          gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" \
+            -f "ref=refs/tags/$tag" \
+            -f "sha=$GITHUB_SHA"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
   publish-windows:
     name: Publish Windows release
     runs-on: windows-latest
+    needs: prepare
 
     steps:
-      - name: Check out source
+      - name: Check out release tag
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Set up .NET 10
         uses: actions/setup-dotnet@v4
@@ -33,22 +76,25 @@ jobs:
 
       - name: Create archive
         shell: pwsh
-        run: Compress-Archive -Path src/MidiMapper/bin/Release/net10.0/win-x64/publish/MidiMapper.exe -DestinationPath MidiMapper-${{ github.ref_name }}-win-x64.zip
+        run: Compress-Archive -Path src/MidiMapper/bin/Release/net10.0/win-x64/publish/MidiMapper.exe -DestinationPath MidiMapper-${{ needs.prepare.outputs.tag }}-win-x64.zip
 
       - name: Upload release asset
         uses: actions/upload-artifact@v4
         with:
-          name: MidiMapper-${{ github.ref_name }}-win-x64
-          path: MidiMapper-${{ github.ref_name }}-win-x64.zip
+          name: MidiMapper-${{ needs.prepare.outputs.tag }}-win-x64
+          path: MidiMapper-${{ needs.prepare.outputs.tag }}-win-x64.zip
           if-no-files-found: error
 
   publish-linux:
     name: Publish Linux release
     runs-on: ubuntu-latest
+    needs: prepare
 
     steps:
-      - name: Check out source
+      - name: Check out release tag
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Set up .NET 10
         uses: actions/setup-dotnet@v4
@@ -68,21 +114,19 @@ jobs:
           esac
 
       - name: Create archive
-        run: |
-          chmod +x src/MidiMapper/bin/Release/net10.0/linux-x64/publish/MidiMapper
-          zip MidiMapper-${{ github.ref_name }}-linux-x64.zip src/MidiMapper/bin/Release/net10.0/linux-x64/publish/MidiMapper
+        run: zip MidiMapper-${{ needs.prepare.outputs.tag }}-linux-x64.zip src/MidiMapper/bin/Release/net10.0/linux-x64/publish/MidiMapper
 
       - name: Upload release asset
         uses: actions/upload-artifact@v4
         with:
-          name: MidiMapper-${{ github.ref_name }}-linux-x64
-          path: MidiMapper-${{ github.ref_name }}-linux-x64.zip
+          name: MidiMapper-${{ needs.prepare.outputs.tag }}-linux-x64
+          path: MidiMapper-${{ needs.prepare.outputs.tag }}-linux-x64.zip
           if-no-files-found: error
 
   create-release:
     name: Create GitHub release
     runs-on: ubuntu-latest
-    needs: [publish-windows, publish-linux]
+    needs: [prepare, publish-windows, publish-linux]
 
     steps:
       - name: Download release assets
@@ -98,4 +142,4 @@ jobs:
       - name: Create release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "${{ github.ref_name }}" dist/*.zip dist/SHA256SUMS.txt --title "MidiMapper ${{ github.ref_name }}" --generate-notes
+        run: gh release create "${{ needs.prepare.outputs.tag }}" dist/*.zip dist/SHA256SUMS.txt --title "MidiMapper ${{ needs.prepare.outputs.tag }}" --generate-notes
