@@ -26,7 +26,7 @@ jobs:
           dotnet-version: 10.x
 
       - name: Test
-        run: dotnet test MidiMapper/MidiMapper.slnx --configuration Release --nologo
+        run: dotnet test src/MidiMapper.slnx --configuration Release --nologo
 
   publish-windows:
     name: Publish Windows canary
@@ -43,11 +43,11 @@ jobs:
           dotnet-version: 10.x
 
       - name: Publish single-file executable
-        run: dotnet publish MidiMapper/MidiMapper/MidiMapper.csproj --configuration Release --runtime win-x64 --nologo
+        run: dotnet publish src/MidiMapper/MidiMapper.csproj --configuration Release --runtime win-x64 --nologo
 
       - name: Create zip archive
         shell: pwsh
-        run: Compress-Archive -Path MidiMapper/MidiMapper/bin/Release/net10.0/win-x64/publish/MidiMapper.exe -DestinationPath MidiMapper-win-x64-canary.zip
+        run: Compress-Archive -Path src/MidiMapper/bin/Release/net10.0/win-x64/publish/MidiMapper.exe -DestinationPath MidiMapper-win-x64-canary.zip
 
       - name: Upload canary artifact
         uses: actions/upload-artifact@v4
@@ -71,13 +71,13 @@ jobs:
           dotnet-version: 10.x
 
       - name: Publish single-file executable
-        run: dotnet publish MidiMapper/MidiMapper/MidiMapper.csproj --configuration Release --runtime linux-x64 --nologo
+        run: dotnet publish src/MidiMapper/MidiMapper.csproj --configuration Release --runtime linux-x64 --nologo
 
       - name: Make executable runnable
-        run: chmod +x MidiMapper/MidiMapper/bin/Release/net10.0/linux-x64/publish/MidiMapper
+        run: chmod +x src/MidiMapper/bin/Release/net10.0/linux-x64/publish/MidiMapper
 
       - name: Create zip archive
-        run: zip MidiMapper-linux-x64-canary.zip MidiMapper/MidiMapper/bin/Release/net10.0/linux-x64/publish/MidiMapper
+        run: zip MidiMapper-linux-x64-canary.zip src/MidiMapper/bin/Release/net10.0/linux-x64/publish/MidiMapper
 
       - name: Upload canary artifact
         uses: actions/upload-artifact@v4

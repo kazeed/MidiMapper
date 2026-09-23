@@ -21,9 +21,9 @@ The converter processes every MIDI channel. Use a drum-only file, or isolate the
 ## Build and test
 
 ```bash
-dotnet restore MidiMapper/MidiMapper.slnx
-dotnet build MidiMapper/MidiMapper.slnx
-dotnet test MidiMapper/MidiMapper.slnx
+dotnet restore src/MidiMapper.slnx
+dotnet build src/MidiMapper.slnx
+dotnet test src/MidiMapper.slnx
 ```
 
 ## Usage
@@ -38,14 +38,14 @@ MidiMapper --help
 When no output is supplied, the result is written beside the input as `<inputname>_AD2.mid`. Existing output files require `--overwrite`:
 
 ```bash
-dotnet run --project MidiMapper/MidiMapper -- input.mid output.mid --overwrite
+dotnet run --project src/MidiMapper -- input.mid output.mid --overwrite
 ```
 
 `--help` prints the complete command syntax and exit-code summary. Paths containing spaces should be quoted. Use `--` before positional paths beginning with a dash.
 
 ## Custom maps
 
-The built-in map is in [`GeneralMidiToAd2Map.cs`](MidiMapper/MidiMapper/GeneralMidiToAd2Map.cs). A custom JSON object replaces it:
+The built-in map is in [`GeneralMidiToAd2Map.cs`](src/MidiMapper/GeneralMidiToAd2Map.cs). A custom JSON object replaces it:
 
 ```json
 { "36": 36, "38": 38, "42": 49 }
@@ -61,13 +61,13 @@ Release publishing defaults to a framework-dependent single-file executable. Sup
 
 ```bash
 # Windows x64
-dotnet publish MidiMapper/MidiMapper/MidiMapper.csproj -c Release -r win-x64
+dotnet publish src/MidiMapper/MidiMapper.csproj -c Release -r win-x64
 
 # Linux x64
-dotnet publish MidiMapper/MidiMapper/MidiMapper.csproj -c Release -r linux-x64
+dotnet publish src/MidiMapper/MidiMapper.csproj -c Release -r linux-x64
 
 # macOS ARM64
-dotnet publish MidiMapper/MidiMapper/MidiMapper.csproj -c Release -r osx-arm64
+dotnet publish src/MidiMapper/MidiMapper.csproj -c Release -r osx-arm64
 ```
 
 The executable requires the matching .NET 10 runtime because it is framework-dependent. The Windows profile writes to `artifacts/win-x64/`.

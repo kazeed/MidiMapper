@@ -6,7 +6,7 @@ This repository contains a small .NET 10 console application for converting drum
 
 1. Read `README.md` and the relevant tests before changing behavior.
 2. Keep changes focused on the requested task.
-3. Run `dotnet build MidiMapper/MidiMapper.slnx` and `dotnet test MidiMapper/MidiMapper.slnx` before handing off.
+3. Run `dotnet build src/MidiMapper.slnx` and `dotnet test src/MidiMapper.slnx` before handing off.
 4. If publishing is affected, verify at least one runtime-specific publish and report any unavailable runtime packs or network failures.
 5. Do not commit, push, or alter Git history unless the user explicitly requests it.
 
