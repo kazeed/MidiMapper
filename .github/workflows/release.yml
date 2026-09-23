@@ -21,10 +21,10 @@ jobs:
       version: ${{ steps.release.outputs.version }}
 
     steps:
-      - name: Check out main
+      - name: Check out release commit
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.sha }}
 
       - name: Create tag
         id: release
@@ -46,13 +46,17 @@ jobs:
             exit 1
           fi
           tag="v$VERSION"
-          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" >/dev/null 2>&1; then
-            echo "Tag $tag already exists." >&2
-            exit 1
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" >/tmp/tag.json 2>/dev/null; then
+            existing_sha=$(jq -r '.object.sha' /tmp/tag.json)
+            if [ "$existing_sha" != "$GITHUB_SHA" ]; then
+              echo "Tag $tag already points to $existing_sha, not $GITHUB_SHA." >&2
+              exit 1
+            fi
+          else
+            gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" \
+              -f "ref=refs/tags/$tag" \
+              -f "sha=$GITHUB_SHA"
           fi
-          gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" \
-            -f "ref=refs/tags/$tag" \
-            -f "sha=$GITHUB_SHA"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
@@ -148,4 +152,9 @@ jobs:
       - name: Create release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create --repo "${{ github.repository }}" "${{ needs.prepare.outputs.tag }}" dist/*.zip dist/SHA256SUMS.txt --title "MidiMapper ${{ needs.prepare.outputs.tag }}" --generate-notes
+        run: |
+          if gh release view --repo "${{ github.repository }}" "${{ needs.prepare.outputs.tag }}" >/dev/null 2>&1; then
+            gh release upload --repo "${{ github.repository }}" "${{ needs.prepare.outputs.tag }}" dist/*.zip dist/SHA256SUMS.txt --clobber
+          else
+            gh release create --repo "${{ github.repository }}" "${{ needs.prepare.outputs.tag }}" dist/*.zip dist/SHA256SUMS.txt --title "MidiMapper ${{ needs.prepare.outputs.tag }}" --generate-notes
+          fi
