@@ -55,7 +55,7 @@ jobs:
         run: dotnet test src/MidiMapper.slnx --configuration Release --collect:"XPlat Code Coverage" --results-directory coverage --nologo
 
       - name: Store coverage report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-report
           path: coverage/**/coverage.cobertura.xml
@@ -108,7 +108,7 @@ jobs:
         run: Compress-Archive -Path src/MidiMapper/bin/Release/net10.0/win-x64/publish/MidiMapper.exe -DestinationPath MidiMapper-win-x64-canary.zip
 
       - name: Upload canary artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: MidiMapper-win-x64-canary-${{ github.sha }}
           path: MidiMapper-win-x64-canary.zip
@@ -139,7 +139,7 @@ jobs:
         run: zip -j MidiMapper-linux-x64-canary.zip src/MidiMapper/bin/Release/net10.0/linux-x64/publish/MidiMapper
 
       - name: Upload canary artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: MidiMapper-linux-x64-canary-${{ github.sha }}
           path: MidiMapper-linux-x64-canary.zip
