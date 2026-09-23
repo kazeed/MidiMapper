@@ -11,10 +11,15 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: canary-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     name: Test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -34,6 +39,7 @@ jobs:
   coverage:
     name: Code coverage
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: test
 
     steps:
@@ -59,6 +65,7 @@ jobs:
     name: Upload main coverage
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: coverage
     permissions:
       contents: read
@@ -81,6 +88,7 @@ jobs:
   publish-windows:
     name: Publish Windows canary
     runs-on: windows-latest
+    timeout-minutes: 15
     needs: test
 
     steps:
@@ -109,6 +117,7 @@ jobs:
   publish-unix:
     name: Publish Linux canary
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: test
 
     steps:
