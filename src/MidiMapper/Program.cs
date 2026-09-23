@@ -5,7 +5,7 @@ namespace MidiMapper;
 
 public static class Program
 {
-    public const string Version = "1.0.0";
+    public static string Version => typeof(Program).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
 
     public const string Usage = """
         Usage: MidiMapper <input.mid> [output.mid] [--map mapping.json] [--overwrite]

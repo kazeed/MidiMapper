@@ -18,6 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.release.outputs.tag }}
+      version: ${{ steps.release.outputs.version }}
 
     steps:
       - name: Check out main
@@ -39,6 +40,11 @@ jobs:
             echo "Version must have the form MAJOR.MINOR.PATCH." >&2
             exit 1
           fi
+          project_version=$(sed -n 's/.*<Version>\([^<]*\)<\/Version>.*/\1/p' src/MidiMapper/MidiMapper.csproj | head -n 1)
+          if [ "$project_version" != "$VERSION" ]; then
+            echo "Project version $project_version does not match requested release $VERSION." >&2
+            exit 1
+          fi
           tag="v$VERSION"
           if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" >/dev/null 2>&1; then
             echo "Tag $tag already exists." >&2
@@ -48,6 +54,7 @@ jobs:
             -f "ref=refs/tags/$tag" \
             -f "sha=$GITHUB_SHA"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
   publish-windows:
     name: Publish Windows release
@@ -72,7 +79,8 @@ jobs:
         shell: pwsh
         run: |
           $version = & src/MidiMapper/bin/Release/net10.0/win-x64/publish/MidiMapper.exe --version
-          if (-not $version.StartsWith('MidiMapper ')) { throw "Unexpected version output: $version" }
+          $expected = 'MidiMapper ${{ needs.prepare.outputs.version }}'
+          if ($version.Trim() -ne $expected) { throw "Expected $expected but got $version" }
 
       - name: Create archive
         shell: pwsh
@@ -108,13 +116,11 @@ jobs:
         run: |
           chmod +x src/MidiMapper/bin/Release/net10.0/linux-x64/publish/MidiMapper
           version=$(src/MidiMapper/bin/Release/net10.0/linux-x64/publish/MidiMapper --version)
-          case "$version" in
-            "MidiMapper "*) ;;
-            *) echo "Unexpected version output: $version"; exit 1 ;;
-          esac
+          expected="MidiMapper ${{ needs.prepare.outputs.version }}"
+          [ "$version" = "$expected" ] || { echo "Expected $expected but got $version"; exit 1; }
 
       - name: Create archive
-        run: zip MidiMapper-${{ needs.prepare.outputs.tag }}-linux-x64.zip src/MidiMapper/bin/Release/net10.0/linux-x64/publish/MidiMapper
+        run: zip -j MidiMapper-${{ needs.prepare.outputs.tag }}-linux-x64.zip src/MidiMapper/bin/Release/net10.0/linux-x64/publish/MidiMapper
 
       - name: Upload release asset
         uses: actions/upload-artifact@v4
@@ -142,4 +148,4 @@ jobs:
       - name: Create release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "${{ needs.prepare.outputs.tag }}" dist/*.zip dist/SHA256SUMS.txt --title "MidiMapper ${{ needs.prepare.outputs.tag }}" --generate-notes
+        run: gh release create --repo "${{ github.repository }}" "${{ needs.prepare.outputs.tag }}" dist/*.zip dist/SHA256SUMS.txt --title "MidiMapper ${{ needs.prepare.outputs.tag }}" --generate-notes
