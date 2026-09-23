@@ -82,6 +82,22 @@ dotnet publish src/MidiMapper/MidiMapper.csproj -c Release -r osx-arm64
 
 The executable requires the matching .NET 10 runtime because it is framework-dependent. The Windows profile writes to `artifacts/win-x64/`.
 
+## Maintainer release process
+
+1. Merge the release-readiness pull request into `main`.
+2. Confirm the pull-request checks and the post-merge canary build pass.
+3. Confirm the project version in `src/MidiMapper/MidiMapper.csproj` matches the intended release tag.
+4. Create and push an annotated semantic-version tag from the verified `main` commit:
+
+   ```bash
+   git switch main
+   git pull --ff-only origin main
+   git tag -a v1.0.0 -m "MidiMapper v1.0.0"
+   git push origin v1.0.0
+   ```
+
+The tag workflow creates the GitHub Release, attaches Windows and Linux archives, and publishes `SHA256SUMS.txt`.
+
 ## Contributing
 
 Contributions are welcome:
