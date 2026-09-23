@@ -1,5 +1,11 @@
 # MidiMapper
 
+[![Latest release](https://img.shields.io/github/v/release/kazeed/MidiMapper?display_name=tag&sort=semver)](https://github.com/kazeed/MidiMapper/releases)
+[![Main canary](https://img.shields.io/github/actions/workflow/status/kazeed/MidiMapper/canary.yml?branch=main&label=main%20canary)](https://github.com/kazeed/MidiMapper/actions/workflows/canary.yml)
+[![Main tests](https://img.shields.io/github/actions/workflow/status/kazeed/MidiMapper/canary.yml?branch=main&label=main%20tests)](https://github.com/kazeed/MidiMapper/actions/workflows/canary.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/kazeed/MidiMapper?branch=main&label=coverage)](https://codecov.io/gh/kazeed/MidiMapper)
+[![License](https://img.shields.io/github/license/kazeed/MidiMapper)](LICENSE)
+
 MidiMapper converts drum MIDI files from the General MIDI percussion layout to the Addictive Drums 2 Standard layout. It is a small cross-platform .NET 10 command-line application built on [Melanchall.DryWetMidi](https://github.com/melanchall/drywetmidi).
 
 ## Features
@@ -87,16 +93,9 @@ The executable requires the matching .NET 10 runtime because it is framework-dep
 1. Merge the release-readiness pull request into `main`.
 2. Confirm the pull-request checks and the post-merge canary build pass.
 3. Confirm the project version in `src/MidiMapper/MidiMapper.csproj` matches the intended release tag.
-4. Create and push an annotated semantic-version tag from the verified `main` commit:
+4. Open **Actions → Release → Run workflow**, select the `main` branch, and enter the version without the leading `v`.
 
-   ```bash
-   git switch main
-   git pull --ff-only origin main
-   git tag -a v1.0.0 -m "MidiMapper v1.0.0"
-   git push origin v1.0.0
-   ```
-
-The tag workflow creates the GitHub Release, attaches Windows and Linux archives, and publishes `SHA256SUMS.txt`.
+The workflow creates the `vMAJOR.MINOR.PATCH` tag, attaches Windows and Linux archives, and publishes `SHA256SUMS.txt`.
 
 ## Contributing
 
