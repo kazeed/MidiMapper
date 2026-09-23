@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Check out release commit
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.sha }}
 
@@ -67,7 +67,7 @@ jobs:
 
     steps:
       - name: Check out release tag
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ needs.prepare.outputs.tag }}
 
@@ -91,7 +91,7 @@ jobs:
         run: Compress-Archive -Path src/MidiMapper/bin/Release/net10.0/win-x64/publish/MidiMapper.exe -DestinationPath MidiMapper-${{ needs.prepare.outputs.tag }}-win-x64.zip
 
       - name: Upload release asset
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: MidiMapper-${{ needs.prepare.outputs.tag }}-win-x64
           path: MidiMapper-${{ needs.prepare.outputs.tag }}-win-x64.zip
@@ -104,7 +104,7 @@ jobs:
 
     steps:
       - name: Check out release tag
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ needs.prepare.outputs.tag }}
 
@@ -127,7 +127,7 @@ jobs:
         run: zip -j MidiMapper-${{ needs.prepare.outputs.tag }}-linux-x64.zip src/MidiMapper/bin/Release/net10.0/linux-x64/publish/MidiMapper
 
       - name: Upload release asset
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: MidiMapper-${{ needs.prepare.outputs.tag }}-linux-x64
           path: MidiMapper-${{ needs.prepare.outputs.tag }}-linux-x64.zip
@@ -140,7 +140,7 @@ jobs:
 
     steps:
       - name: Download release assets
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: dist
           merge-multiple: true
