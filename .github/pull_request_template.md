@@ -4,8 +4,8 @@
 
 ## Verification
 
-- [ ] `dotnet build MidiMapper/MidiMapper.slnx`
-- [ ] `dotnet test MidiMapper/MidiMapper.slnx`
+- [ ] `dotnet build src/MidiMapper.slnx`
+- [ ] `dotnet test src/MidiMapper.slnx`
 - [ ] CLI behavior checked, if applicable
 - [ ] Publish behavior checked, if applicable
 
