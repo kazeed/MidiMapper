@@ -55,6 +55,16 @@ Keys and values must be integer MIDI pitches from 0 through 127. Missing keys pa
 
 The AD2 target assignments are based on [XLN Audio's published AD2 Keymap](https://support.xlnaudio.com/hc/en-us/articles/16925247222045-Addictive-Drums-2-Keymap). The built-in map covers the practical GM percussion inputs available for this conversion: direct kit pieces, Hand Clap and Electric Snare fallbacks, plus Tambourine, Cowbell, and Claves routed to AD2 Flexi articulations. Remaining GM sounds without a useful AD2 Standard target are intentionally left unmapped rather than assigned an inaccurate target. AD2 kits and presets can vary, so verify the result against the preset you use.
 
+### Mapping limits
+
+The built-in map intentionally leaves these GM percussion notes unchanged and reports their played hits:
+
+- `58`: Vibraslap
+- `60–74`: Bongos, congas, timbales, agogos, cabasa, maracas, whistles, and guiros
+- `76–81`: Wood blocks, cuica, and triangle
+
+These sounds do not have a sufficiently reliable one-to-one destination in the AD2 Standard keymap. Use `--map` for a deliberate project- or kit-specific choice. Notes outside the GM percussion range are also preserved unless a custom map explicitly assigns them. Since every MIDI channel is processed, use a drum-only file when the source contains pitched instruments.
+
 ## Publish a single executable
 
 Release publishing defaults to a framework-dependent single-file executable. Supply the runtime identifier for the target platform:
