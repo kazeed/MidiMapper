@@ -5,9 +5,12 @@ namespace MidiMapper;
 
 public static class Program
 {
+    public const string Version = "1.0.0";
+
     public const string Usage = """
         Usage: MidiMapper <input.mid> [output.mid] [--map mapping.json] [--overwrite]
                MidiMapper --help
+               MidiMapper --version
         Default output: <input>_AD2.mid alongside the input.
         --map replaces the built-in GM-to-AD2 map with a JSON pitch-to-pitch object.
         --overwrite permits replacing an existing output. Input must be a different path.
@@ -25,6 +28,11 @@ public static class Program
         if (args.Length == 1 && args[0] is "--help" or "-h")
         {
             output.WriteLine(Usage);
+            return 0;
+        }
+        if (args.Length == 1 && args[0] == "--version")
+        {
+            output.WriteLine($"MidiMapper {Version}");
             return 0;
         }
 

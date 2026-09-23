@@ -63,6 +63,8 @@ public sealed class RegressionTests : IDisposable
     public void CliHandlesHelpUsageAndMissingFiles()
     {
         Assert.Equal(0, Run("--help").Code);
+        Assert.Equal(0, Run("--version").Code);
+        Assert.Contains("1.0.0", Run("--version").Output);
         Assert.Equal(1, Run().Code);
         Assert.Equal(1, Run("a", "b", "c").Code);
         Assert.Equal(1, Run("--unknown").Code);
